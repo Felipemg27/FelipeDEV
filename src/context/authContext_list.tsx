@@ -12,15 +12,17 @@ import { TouchableOpacity, Text, View, StyleSheet, KeyboardAvoidingView, Platfor
 export const AuthContextList:any= createContext({});
 
 const flags = [
-    { caption: 'urgente', color: themas.Colors.red },
-    { caption: 'opcional', color: themas.Colors.blueLigth }
+    { caption: 'Vencido', color: themas.Colors.red },
+    { caption: 'Pago', color: themas.Colors.blueLigth },
+    { caption: 'teste', color: themas.Colors.gray }
 ];
 
 export const AuthProviderList = (props) => {
     const modalizeRef = useRef(null);
     const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [selectedFlag, setSelectedFlag] = useState('urgente');
+    const [description, setDocumentação] = useState('');
+    const [phone, setPhone] = useState('');
+    const [selectedFlag, setSelectedFlag] = useState('Vencido');
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedTime, setSelectedTime] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -89,7 +91,7 @@ export const AuthProviderList = (props) => {
 
     const handleEdit = async (itemToEdit:PropCard) => {
         setTitle(itemToEdit.title);
-        setDescription(itemToEdit.description);
+        setDocumentação(itemToEdit.description);
         setSelectedFlag(itemToEdit.flag);
         setItem(itemToEdit.item)
         
@@ -141,8 +143,8 @@ export const AuthProviderList = (props) => {
 
     const setData = ()=>{
         setTitle('');
-        setDescription('');
-        setSelectedFlag('urgente');
+        setDocumentação('');
+        setSelectedFlag('Vencido');
         setItem(0)
         setSelectedDate(new Date());
         setSelectedTime(new Date());
@@ -153,39 +155,49 @@ export const AuthProviderList = (props) => {
             <KeyboardAvoidingView 
                 style={styles.container}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
+                keyboardVerticalOffset={Platform.OS === "android" ? 40 : 0}
             >
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                     <View style={styles.header}>
                         <TouchableOpacity onPress={() => onClose()}>
                             <MaterialIcons name="close" size={30} />
                         </TouchableOpacity>
-                        <Text style={styles.title}>{item != 0?'Editar tarefa':'Criar tarefa'}</Text>
+                        <Text style={styles.title}>{item != 0?'Editar tarefa':'Registro do cliente'}</Text>
                         <TouchableOpacity onPress={handleSave}>
                             <AntDesign name="check" size={30} />
                         </TouchableOpacity>
                     </View>
                     <View style={styles.content}>
                         <Input 
-                            title="Título:" 
+                            title="Cliente:" 
                             labelStyle={styles.label} 
                             value={title}
                             onChangeText={setTitle}
                         />
                         <Input 
-                            title="Descrição:" 
+                            title="Documentação:" 
                             numberOfLines={5} 
-                            height={100} 
+                            height={30} 
                             multiline 
                             labelStyle={styles.label} 
                             textAlignVertical="top"
                             value={description}
-                            onChangeText={setDescription}
+                            onChangeText={setDocumentação}
+                        />
+
+                            <Input 
+                            title="Telefone:" 
+                            numberOfLines={5} 
+                            height={30} 
+                            multiline 
+                            labelStyle={styles.label} 
+                            value={phone}
+                            onChangeText={setPhone}
                         />
                         <View style={{ width: '100%', flexDirection: 'row', gap: 10 }}>
                             <TouchableOpacity onPress={() => setShowDatePicker(true)}  style={{ width: 200,zIndex:999 }}>
                                 <Input 
-                                    title="Data limite:" 
+                                    title="Mensalidade:" 
                                     labelStyle={styles.label} 
                                     editable={false}
                                     value={selectedDate.toLocaleDateString()}
@@ -193,13 +205,7 @@ export const AuthProviderList = (props) => {
                                 />
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => setShowDatePicker(true)}   style={{ width: 100 }}>
-                                <Input 
-                                    title="Hora limite:" 
-                                    labelStyle={styles.label} 
-                                    editable={false}
-                                    value={selectedTime.toLocaleTimeString()}
-                                    onPress={() => setShowTimePicker(true)}
-                                />
+                                
                             </TouchableOpacity>
                         </View>
 
@@ -231,7 +237,8 @@ export const AuthProviderList = (props) => {
     return (
         <AuthContextList.Provider value={{ onOpen, taskList,handleEdit,handleDelete}}>
             {props.children}
-            <Modalize ref={modalizeRef} childrenStyle={{ height: 600 }} adjustToContentHeight={true}>
+            <Modalize ref={modalizeRef} childrenStyle={{ height: 500 }} 
+            adjustToContentHeight={true}>
                 {_container()}
             </Modalize>
         </AuthContextList.Provider>
