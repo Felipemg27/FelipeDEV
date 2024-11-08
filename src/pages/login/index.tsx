@@ -26,7 +26,7 @@ export default function Login (){
                 return Alert.alert('Anteção','Informe os campos obrigatórios!')
             }
 
-            if(email === 'admin' && password === '123456'){
+            if(email === 'Admin' && password === '123456'){
                 return navigation.reset({routes:[{name :'BottomRoutes'}]});
             }
 
