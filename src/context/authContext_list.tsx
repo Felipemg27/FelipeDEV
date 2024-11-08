@@ -151,7 +151,7 @@ export const AuthProviderList = (props) => {
 
     const setData = ()=>{
         setTitle('');
-        setDocumentação('admin');
+        setDocumentação('');
         setSelectedFlag('');
         setTelefone('');
         setItem(0);
