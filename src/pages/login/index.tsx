@@ -12,7 +12,7 @@ import { TextInput } from "react-native-gesture-handler";
 export default function Login (){
     const navigation = useNavigation<NavigationProp<any>>();
 
-    const [email,setEmail]               = useState('Admin');
+    const [email,setEmail]               = useState('admin');
     const [password,setPassword]         = useState('123456');
     const [showPassword,setShowPassword] = useState(false);
     const [loading,setLoading]           = useState(false)
@@ -26,7 +26,7 @@ export default function Login (){
                 return Alert.alert('Anteção','Informe os campos obrigatórios!')
             }
 
-            if(email === 'Admin' && password === '123456'){
+            if(email === 'admin' && password === '123456'){
                 return navigation.reset({routes:[{name :'BottomRoutes'}]});
             }
 
