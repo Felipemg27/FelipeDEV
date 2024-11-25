@@ -185,7 +185,7 @@ export const AuthProviderList = (props) => {
                             height={30} 
                         />
                         <Input 
-                            title="RGa:" 
+                            title="RG:" 
                             numberOfLines={5} 
                             height={30} 
                             multiline 
