@@ -1,3 +1,5 @@
+
+
 import React, { createContext, useContext, useEffect, useRef, useState } from "react"; 
 import { themas } from "../global/themes";
 import { Flag } from "../components/Flag";
@@ -11,28 +13,28 @@ import { Caption } from "react-native-paper";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 
 
-export const AuthContextList:any= createContext({});
+export const AuthContextList:any = createContext({});
 
 const flags = [
     { caption: 'vencer', color: themas.Colors.red },
     { caption: 'pago', color: themas.Colors.blueLigth },
-   
-    
-    
 ];
 
 export const AuthProviderList = (props) => {
     const modalizeRef = useRef(null);
     const [title, setTitle] = useState('');
     const [description, setDocumentação] = useState('');
-    const [phone,setTelefone]= useState ('');
+    const [phone, setTelefone] = useState('');
+    const [cpf, setCpf] = useState('');
+    const [endereco, setEndereco] = useState('');
+    const [dataNascimento, setDataNascimento] = useState(new Date());
     const [selectedFlag, setSelectedFlag] = useState('');
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedTime, setSelectedTime] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
     const [taskList, setTaskList] = useState([]);
-    const [item,setItem] = useState(0)
+    const [item, setItem] = useState(0);
 
     const onOpen = () => {
         modalizeRef.current?.open();
@@ -51,14 +53,18 @@ export const AuthProviderList = (props) => {
     };
 
     const handleTimeChange = (date) => {
-        setSelectedTime(date)
+        setSelectedTime(date);
     };
+
     const handleSave = async () => {
         const newItem = {
             item: item !== 0 ? item : Date.now(),
             title,
             description,
             phone,
+            cpf,
+            endereco,
+            dataNascimento: dataNascimento.toISOString(),
             flag: selectedFlag,
             timeLimit: new Date(
                 selectedDate.getFullYear(),
@@ -68,15 +74,14 @@ export const AuthProviderList = (props) => {
                 selectedTime.getMinutes()
             ).toISOString()
         };
-        
-    
+
         try {
             const storedData = await AsyncStorage.getItem('taskList');
             let taskList = storedData ? JSON.parse(storedData) : [];
-    
+
             // Verifica se o item já existe no array
             const itemIndex = taskList.findIndex((task) => task.item === newItem.item);
-    
+
             if (itemIndex >= 0) {
                 // Substitui o item existente pelo novo
                 taskList[itemIndex] = newItem;
@@ -84,45 +89,46 @@ export const AuthProviderList = (props) => {
                 // Adiciona o novo item ao array
                 taskList.push(newItem);
             }
-    
+
             await AsyncStorage.setItem('taskList', JSON.stringify(taskList));
             setTaskList(taskList);
-            setData()
+            setData();
             onClose();
         } catch (error) {
             console.error("Erro ao salvar o item:", error);
         }
     };
-    
 
-    const handleEdit = async (itemToEdit:PropCard) => {
+    const handleEdit = async (itemToEdit) => {
         setTitle(itemToEdit.title);
         setTelefone(itemToEdit.phone);
         setDocumentação(itemToEdit.description);
+        setCpf(itemToEdit.cpf);
+        setEndereco(itemToEdit.endereco);
+        setDataNascimento(new Date(itemToEdit.dataNascimento));
         setSelectedFlag(itemToEdit.flag);
-        setItem(itemToEdit.item)
-        
+        setItem(itemToEdit.item);
+
         const timeLimit = new Date(itemToEdit.timeLimit);
         setSelectedDate(timeLimit);
         setSelectedTime(timeLimit);
-        
-        onOpen(); 
+
+        onOpen();
     };
-    
+
     const handleDelete = async (itemToDelete) => {
         try {
             const storedData = await AsyncStorage.getItem('taskList');
             const taskList = storedData ? JSON.parse(storedData) : [];
-            
+
             const updatedTaskList = taskList.filter(item => item.item !== itemToDelete.item);
-    
+
             await AsyncStorage.setItem('taskList', JSON.stringify(updatedTaskList));
             setTaskList(updatedTaskList);
         } catch (error) {
             console.error("Erro ao excluir o item:", error);
         }
     };
-    
 
     async function get_taskList() {
         try {
@@ -137,9 +143,9 @@ export const AuthProviderList = (props) => {
     const _renderFlags = () => {
         return flags.map((item, index) => (
             <TouchableOpacity key={index} 
-            onPress={() => {
-                setSelectedFlag(item.caption)
-            }}>
+                onPress={() => {
+                    setSelectedFlag(item.caption);
+                }}>
                 <Flag 
                     caption={item.caption}
                     color={item.color} 
@@ -149,15 +155,18 @@ export const AuthProviderList = (props) => {
         ));
     };
 
-    const setData = ()=>{
+    const setData = () => {
         setTitle('');
         setDocumentação('');
-        setSelectedFlag('');
+        setCpf('');
+        setEndereco('');
+        setDataNascimento(new Date());
         setTelefone('');
+        setSelectedFlag('');
         setItem(0);
         setSelectedDate(new Date());
         setSelectedTime(new Date());
-    }
+    };
 
     const _container = () => {
         return (
@@ -171,7 +180,7 @@ export const AuthProviderList = (props) => {
                         <TouchableOpacity onPress={() => onClose()}>
                             <MaterialIcons name="close" size={30} />
                         </TouchableOpacity>
-                        <Text style={styles.title}>{item != 0?'Editar tarefa':'Registro do cliente'}</Text>
+                        <Text style={styles.title}>{item != 0 ? 'Editar tarefa' : 'Registro do cliente'}</Text>
                         <TouchableOpacity onPress={handleSave}>
                             <AntDesign name="check" size={30} />
                         </TouchableOpacity>
@@ -193,7 +202,7 @@ export const AuthProviderList = (props) => {
                             textAlignVertical="top"
                             value={description}
                             onChangeText={setDocumentação}
-                            />
+                        />
                         <Input 
                             title="Telefone:" 
                             numberOfLines={5} 
@@ -202,37 +211,43 @@ export const AuthProviderList = (props) => {
                             labelStyle={styles.label} 
                             textAlignVertical="top"
                             value={phone}
-                            onChangeText={setTelefone}>
-                            
-
-                        </Input>
-                        <View style={{ width: '100%', flexDirection: 'row', gap: 10 }}>
-                            <TouchableOpacity onPress={() => setShowDatePicker(true)}  style={{ width: 200,zIndex:999 }}>
-                                <Input 
-                                    title="Data limite:" 
-                                    labelStyle={styles.label} 
-                                    editable={false}
-                                    value={selectedDate.toLocaleDateString()}
-                                    onPress={() => setShowDatePicker(true)} 
-                                />
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => setShowDatePicker(true)}   style={{ width: 100 }}>
-                               
-                            </TouchableOpacity>
-                        </View>
-
-                            <CustomDateTimePicker 
-                                type='date' 
-                                onDateChange={handleDateChange} 
-                                show={showDatePicker} 
-                                setShow={setShowDatePicker} 
+                            onChangeText={setTelefone}
+                        />
+                        <Input 
+                            title="CPF:" 
+                            height={30} 
+                            labelStyle={styles.label} 
+                            value={cpf}
+                            onChangeText={setCpf}
+                        />
+                        <Input 
+                            title="Endereço:" 
+                            height={30} 
+                            labelStyle={styles.label} 
+                            value={endereco}
+                            onChangeText={setEndereco}
+                        />
+                        <TouchableOpacity onPress={() => setShowDatePicker(true)} style={{ width: 200, zIndex: 999 }}>
+                            <Input 
+                                title="Data Nascimento:" 
+                                labelStyle={styles.label} 
+                                editable={false}
+                                value={dataNascimento.toLocaleDateString()}
                             />
-                            <CustomDateTimePicker 
-                                type='time' 
-                                onDateChange={handleTimeChange} 
-                                show={showTimePicker} 
-                                setShow={setShowTimePicker} 
-                            />
+                        </TouchableOpacity>
+
+                        <CustomDateTimePicker 
+                            type='date' 
+                            onDateChange={handleDateChange} 
+                            show={showDatePicker} 
+                            setShow={setShowDatePicker} 
+                        />
+                        <CustomDateTimePicker 
+                            type='time' 
+                            onDateChange={handleTimeChange} 
+                            show={showTimePicker} 
+                            setShow={setShowTimePicker} 
+                        />
 
                         <View style={styles.containerFlag}>
                             <Text style={styles.flag}>Flags:</Text>
@@ -247,9 +262,9 @@ export const AuthProviderList = (props) => {
     };
 
     return (
-        <AuthContextList.Provider value={{ onOpen, taskList,handleEdit,handleDelete}}>
+        <AuthContextList.Provider value={{ onOpen, taskList, handleEdit, handleDelete }}>
             {props.children}
-            <Modalize ref={modalizeRef} childrenStyle={{ height: 470}} adjustToContentHeight={true}>
+            <Modalize ref={modalizeRef} childrenStyle={{ height: 700}} adjustToContentHeight={true}>
                 {_container()}
             </Modalize>
         </AuthContextList.Provider>
@@ -271,25 +286,24 @@ export const styles = StyleSheet.create({
     },
     title: {
         fontSize: 20,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
     },
     content: {
         width: '100%',
-        paddingHorizontal: 20
+        paddingHorizontal: 20,
     },
     label: {
         fontWeight: 'bold',
-        color: '#000'
+        color: '#000',
     },
     containerFlag: {
         width: '100%',
-        padding: 10
+        padding: 10,
     },
     flag: {
         fontSize: 14,
-        fontWeight: 'bold'
-    }
+        fontWeight: 'bold',
+    },
 });
-
 
 export const useAuth = () => useContext(AuthContextList);
